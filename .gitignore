@@ -1,0 +1,4 @@
+./packer-centos7-kvm-k8s
+./packer-centos7-kvm-k8s.pub
+./centos7-base-img
+./packer_cachegit
