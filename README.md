@@ -34,7 +34,7 @@
 
 <!-- /TOC -->
 
-# Deploy Kubernetes cluster using Packer and Kickstart - Centos 7.x hands-on
+# Deploy Kubernetes cluster using Packer and Kickstart - Centos hands-on
 
 ## Abstract and learning objectives
 
@@ -45,3 +45,11 @@ This hands-on lab is designed to guide you through the process of building and d
 ## Solution architecture
 
 ## Requirements
+
+## Annotations
+
+Push to master
+
+```sh
+ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
+```
