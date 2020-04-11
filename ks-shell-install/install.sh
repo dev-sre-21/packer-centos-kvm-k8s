@@ -9,6 +9,7 @@ set -o pipefail
 # author: Thiago Fonseca Born da Silva
 # e-mail: thiagofborn@gmail.com
 #-------------------------------------------------
+date=`date`
 
 echo "Installing VI improved"
 yum -y install screen vim
@@ -24,10 +25,10 @@ echo "Enable br_netfilter"
 modprobe br_netfilter
 echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
 
-echo "Adding Kubernetes Official repository $(date) | "
+echo "Adding Kubernetes Official repository $date | "
 echo "
 #--------------------------------------------------------------------------------
-# Adding Kubernetes Official repository $(date) |
+# Adding Kubernetes Official repository $date |
 #--------------------------------------------------------------------------------
 [kubernetes]
 name=Kubernetes
