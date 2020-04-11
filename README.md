@@ -42,6 +42,8 @@ This hands-on lab is designed to guide you through the process of building and d
 
 ## Overview
 
+Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be defined to rotate based on IO operations, and moved to a remote server. The condition to be moved need to respect low IO operations. In other words, if the IO operations are lower than 30% the rotate logs should be moved to a remote server. 
+
 ## Solution architecture
 
 ## Requirements
