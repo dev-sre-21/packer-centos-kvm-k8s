@@ -101,6 +101,24 @@ osinfo-query os | grep centos
 
 Creating VM command line
 
+After the image get done we have the results written at:
+
+```text
+The disk:
+./centos7-k8s-base-img/centos7-k8s-base 
+```
+
+And
+
+```text
+The downloaded ISO
+./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso
+```
+
+So, to create the KVM guest we need to add this paths to the command line composition as follows:
+
+> Notice: Plus the VM name.
+
 ```sh
 VM="centos-kvm-k8s-01"
 DISK="./centos7-k8s-base-img/centos7-k8s-base"
