@@ -19,7 +19,7 @@
         ]
       ],
       "disk_interface": "virtio",
-      "disk_size": 50000,
+      "disk_size": "100000",
       "format": "qcow2",
       "net_device": "virtio-net",
       "iso_url": "{{ user `iso` }}",
