@@ -18,7 +18,8 @@ echo "Installing Docker"
 curl -fsSL https://get.docker.com | bash
 
 echo "Disable SELinux"
-setenforce 0
+# setenforce 0 # it is already defined on the KickStart template as permissive
+# Making the change permanent
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
 echo "Enable br_netfilter"
