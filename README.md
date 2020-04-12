@@ -2,7 +2,7 @@
 
 <!-- TOC -->
 
-- [Deploy Kubernetes cluster using Packer and Kickstart - Centos 7.x hands-on lab step-by-step](#deploy-kubernetes-cluster-using-packer-and-kickstart---centos-7.x-hands-on-lab-step-by-step)
+- [Deploy Kubernetes cluster using Packer and Kickstart - Centos 7.x hands-on lab](#deploy-kubernetes-cluster-using-packer-and-kickstart---centos-7.x-hands-on-lab)
   - [Abstract and learning objectives](#abstract-and-learning-objectives)
   - [Overview](#overview)
   - [Solution architecture](#solution-architecture)
@@ -46,7 +46,26 @@ Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be 
 
 ## Solution architecture
 
+One host computer with a Linux distribution, to create 3 virtual machines each one will be a node of the Kubernetes cluster.
+
+
+The file *centos7-k8s-base.json*:
+
+Values to notice: "disk_size": "5000000", it is in kbytes
+
 ## Requirements
+
+It is simplified in *software* and *hardware* requirements.
+
+- Software:
+1. Packer
+<https://packer.io/downloads.html>
+2. KVM 
+<https://www.linux-kvm.org/page/Main_Page>
+
+- Hardware:
+1. HD Free space around 15 giga
+2. RAM around 8 Giga
 
 ## Commands and annotations
 
@@ -70,9 +89,24 @@ Getting the guest's IP address
 *default* here is the network name
 
 ```sh
- sudo virsh net-list # Get the network name
+sudo virsh net-list # Get the network name
 sudo virsh net-dhcp-leases default
 ```
+
+Check the possible --os-variant OS
+
+```sh
+osinfo-query os | grep centos
+```
+
+Creating VM command line
+
+```sh
+VM="centos-kvm-k8s-01"
+DISK="./centos7-k8s-base-img/centos7-k8s-base"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+``` 
 
 1. References: 
 * Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
