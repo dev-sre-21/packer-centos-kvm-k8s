@@ -48,10 +48,31 @@ Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be 
 
 ## Requirements
 
-## Annotations
+## Commands and annotations
 
 Push to master
+
+When git completes, ssh-agent terminates, and the key is forgotten.
 
 ```sh
 ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
 ```
+
+List and Shutdown guest VM KVM command line
+
+```sh
+sudo virsh list # it will show the guests running, to list all the guests add --all at the end
+sudo virsh shutdown 11 --mode acpi
+```
+
+Getting the guest's IP address
+
+*default* here is the network name
+
+```sh
+ sudo virsh net-list # Get the network name
+sudo virsh net-dhcp-leases default
+```
+
+1. References: 
+* Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
