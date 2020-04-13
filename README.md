@@ -11,27 +11,17 @@
   - [Requirements](#requirements)
   - [Main task 1: Installing Packer](#installing-packer)
     - [Task 1: Setting up your local environment to run Packer](#setting-up-your-local-environment-to-run-packer)
-    - [Task 2: Browsing to the web application](#task-2-browsing-to-the-web-application)
-    - [Task 3: Create a Dockerfile](#task-3-create-a-dockerfile)
-  - [Main task 2: Deploy the solution to Azure Kubernetes Service](#exercise-2-deploy-the-solution-to-azure-kubernetes-service)
-    - [Task 1: Tunnel into the Azure Kubernetes Service cluster](#task-1-tunnel-into-the-azure-kubernetes-service-cluster)
-    - [Task 2: Deploy a service using the Kubernetes management dashboard](#task-2-deploy-a-service-using-the-kubernetes-management-dashboard)
-    - [Task 3: Deploy a service using kubectl](#task-3-deploy-a-service-using-kubectl)
-    - [Task 4: Deploy a service using a Helm chart](#task-4-deploy-a-service-using-a-helm-chart)
-    - [Task 5: Initialize database with a Kubernetes Job](#task-5-initialize-database-with-a-kubernetes-job)
-    - [Task 6: Test the application in a browser](#task-6-test-the-application-in-a-browser)
-    - [Task 7: Configure Continuous Delivery to the Kubernetes Cluster](#task-7-configure-continuous-delivery-to-the-kubernetes-cluster)
-    - [Task 8: Review Azure Monitor for Containers](#task-8-review-azure-monitor-for-containers)
-  - [Exercise 3: Scale the application and test HA](#exercise-3-scale-the-application-and-test-ha)
-    - [Task 1: Increase service instances from the Kubernetes dashboard](#task-1-increase-service-instances-from-the-kubernetes-dashboard)
-    - [Task 2: Increase service instances beyond available resources](#task-2-increase-service-instances-beyond-available-resources)
-    - [Task 3: Restart containers and test HA](#task-3-restart-containers-and-test-ha)
-  - [Exercise 4: Working with services and routing application traffic](#exercise-4-working-with-services-and-routing-application-traffic)
-    - [Task 1: Scale a service without port constraints](#task-1-scale-a-service-without-port-constraints)
+    - [Task 2: xxxxx](#task-2-browsing-to-the-web-application)
+    - [Task 3: xxxxx](#task-3-create-a-dockerfile)
+  - [Main task 2: xx](#exercise-2-deploy-the-solution-to-azure-kubernetes-service)
+    - [Task 1: xxxxx](#task-1-tunnel-into-the-azure-kubernetes-service-cluster)
+    - [Task 2: xxxxx](#task-2-deploy-a-service-using-the-kubernetes-management-dashboard)
+  - [Exercise 3: xxx](#exercise-3-scale-the-application-and-test-ha)
+    - [Task 1: xxxxx](#task-1-increase-service-instances-from-the-kubernetes-dashboard)
+  - [Exercise 4: xxx](#exercise-4-working-with-services-and-routing-application-traffic)
+    - [Task 1: xxxxx](#task-1-scale-a-service-without-port-constraints)
     - [Task 2: Update an external service to support dynamic discovery with a load balancer](#task-2-update-an-external-service-to-support-dynamic-discovery-with-a-load-balancer)
-    - [Task 3: Adjust CPU constraints to improve scale](#task-3-adjust-cpu-constraints-to-improve-scale)
-    - [Task 4: Perform a rolling update](#task-4-perform-a-rolling-update)
-    - [Task 5: Configure Kubernetes Ingress](#task-5-configure-kubernetes-ingress)
+    - [Task 3: xxxxx](#task-3-adjust-cpu-constraints-to-improve-scale)
   - [After the hands-on lab](#after-the-hands-on-lab)
 
 <!-- /TOC -->
@@ -61,9 +51,9 @@ Let's simplify in *software* and *hardware* requirements.
 2. KVM <https://www.linux-kvm.org/page/Main_Page>
 3. KickStart <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax>
 
-Packer: file related *centos7-k8s-base.json*
-KVM: file related *TODO* (shell script to launch the vms for testing)
-KickStart: file related *c7-kvm-k8s.cfg*
+Packer: file related *centos7-k8s-base.json*<br\>
+KVM: file related *TODO* (shell script to launch the vms for testing)<br\>
+KickStart: file related *c7-kvm-k8s.cfg*<br\>
 
 - Hardware:
 
@@ -79,7 +69,6 @@ Example:
 
 ```sh
 curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
-
 ```
 
 >Notice: Because the packer is already compiled, it is a good practice to verify if the file was perfectly downloaded.
@@ -101,8 +90,7 @@ gpg --import hashicorp.asc
 gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 ```
 
-In case you get a Warning like follows.
-We are on the same boat.
+In case you get a Warning like follows. We are on the same boat.
 
 ```text
 born # gpg --import hashicorp.asc
@@ -131,9 +119,28 @@ Learn more at: <https://www.hashicorp.com/security/>
 
 ## Setting up your local environment to run Packer
 
-After the download and verifications. We can the *packer binary*, to a proper location. Like */usr/local/bin*.
+After the download and verifications. We can the *packer binary*, to a proper location, like: */usr/local/bin*.
+
+## Clone the repository
+
+## Set your own variables
+
+## Launch your KVM guest
 
 ## Commands and annotations
+
+## My stuff bellow, I will delete it in the future and add somewhere else
+
+## TODO
+
+Setup the VM's configuration automatically.
+
+1. Set the hostnames accordingly
+2. Set up the K8s Master
+3. Set up the log rotation
+4. Write a app to maintain the log transference based on the IO operations
+
+Fix the index README.md
 
 Push to master
 
@@ -145,7 +152,7 @@ ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.co
 
 Packer template:
 
-Values to notice: "disk_size": "10000", it is in mbytes.
+>Values to notice: "disk_size": "10000", it is in mbytes.
 It is around 10 gigabytes.
 
 List and Shutdown guest VM KVM command line
@@ -217,6 +224,6 @@ ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 ```
 
-1. References:
+- References
 
 - Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
