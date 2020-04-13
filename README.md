@@ -38,7 +38,7 @@
 
 ## Abstract and learning objectives
 
-This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. In addition to learning how to work with remote log administration, first commands for Kubernetes administration. (service scale-out, and high-availability, monitoring and trancing, will be a next project).
+This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. Also, how to work with remote log administration. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes administration, KVM administration with virsh will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project).
 
 ## Overview
 
@@ -121,6 +121,12 @@ So, to create the KVM guest we need to add this paths to the command line compos
 
 ```sh
 VM="centos-kvm-k8s-01"
+DISK="./centos7-k8s-base-img/centos7-k8s-base"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+
+
+VM="centos-kvm-k8s-02"
 DISK="./centos7-k8s-base-img/centos7-k8s-base"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
