@@ -102,10 +102,6 @@ gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 
 In case you get a Warning like follows.
 We are on the same boat.
-
-Take a look at:
-<https://github.com/hashicorp/packer/issues/8745><br/> 
-
 ```text
 born ~/books/experiments/packer_sec_test ~ gpg --import hashicorp.asc
 gpg: key 51852D87348FFC4C: public key "HashiCorp Security <security@hashicorp.com>" imported
@@ -121,6 +117,11 @@ Primary key fingerprint: 91A6 E7F8 5D05 C656 30BE  F189 5185 2D87 348F FC4C
 born ~/books/experiments/packer_sec_test ~
 
 ```
+
+Take a look at:
+<https://github.com/hashicorp/packer/issues/8745><br/> 
+
+
 
 
 # Verify the SHASUM matches the binary.
