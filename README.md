@@ -1,4 +1,6 @@
-**Contents**
+# Deploy Kubernetes cluster using Packer and Kickstart - Centos hands-on
+
+## Contents
 
 <!-- TOC -->
 
@@ -34,8 +36,6 @@
 
 <!-- /TOC -->
 
-# Deploy Kubernetes cluster using Packer and Kickstart - Centos hands-on
-
 ## Abstract and learning objectives
 
 This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. Also, how to work with remote log administration. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes administration, KVM administration with virsh will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project).
@@ -55,9 +55,10 @@ In this lab, I have used Fedora, and for the KVM guests are CentOS.
 Let's simplify in *software* and *hardware* requirements.
 
 - Software:
+
 1. Packer
 <https://packer.io/downloads.html>
-2. KVM 
+2. KVM
 <https://www.linux-kvm.org/page/Main_Page>
 3. KickStart
 <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax>
@@ -67,15 +68,17 @@ KVM: file related *TODO* (shell script to launch the vms for testing)
 KickStart: file related *c7-kvm-k8s.cfg*
 
 - Hardware:
-1. HD Free space around 15 giga: considering th
+
+1. HD Free space around 15 giga: considering the three VMs that will host Master, the two K8s Nodes.
 2. RAM around 8 Giga
 
 ## Installing Packer
 
 From the hypervisor. Go to <https://releases.hashicorp.com/packer/>, find the latest release (some say this is the best practice).
-Download it and unzip. 
+Download it and unzip.
 
 Example:
+
 ```sh
 curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
 
@@ -122,10 +125,9 @@ born ~/books/experiments/packer_sec_test ~
 Take a look at:
 <https://github.com/hashicorp/packer/issues/8745>
 
-
 Verify the SHASUM matches the binary.
 
-```
+```sh
 shasum -a 256 -c packer_1.5.5_SHA256SUMS
 ```
 
@@ -141,11 +143,10 @@ When git completes, ssh-agent terminates, and the key is forgotten.
 ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
 ```
 
-Packer template: 
+Packer template:
 
 Values to notice: "disk_size": "10000", it is in mbytes. 
 It is around 10 gigabytes.
-
 
 List and Shutdown guest VM KVM command line
 
@@ -175,7 +176,7 @@ After the image get done we have the results written at:
 
 ```text
 The disk:
-./centos7-k8s-base-img/centos7-k8s-base 
+./centos7-k8s-base-img/centos7-k8s-base
 ```
 
 And
@@ -195,12 +196,22 @@ DISK="./centos7-k8s-base-img/centos7-k8s-base"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 
+# lazyness: copying the main image to other vms
+cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-base-img/centos7-k8s-base-1
+cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-base-img/centos7-k8s-base-2
 
+# Changed the DISK variable to point to the copy of centos7-k8s-base
 VM="centos-kvm-k8s-02"
-DISK="./centos7-k8s-base-img/centos7-k8s-base"
+DISK="./centos7-k8s-base-img/centos7-k8s-base-1"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
-``` 
 
-1. References: 
-* Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
+VM="centos-kvm-k8s-02"
+DISK="./centos7-k8s-base-img/centos7-k8s-base-2"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+```
+
+1. References:
+
+- Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
