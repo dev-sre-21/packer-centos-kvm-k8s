@@ -7,7 +7,7 @@
   - [Overview](#overview)
   - [Solution architecture](#solution-architecture)
   - [Requirements](#requirements)
-  - [Main task 1: Installing Packer](#provision-a-three-nodes-kubernet-cluster)
+  - [Main task 1: Installing Packer](#installing-packer)
     - [Task 1: Setting up your local environment to run Packer](#setting-up-your-local-environment-to-run-packer)
     - [Task 2: Browsing to the web application](#task-2-browsing-to-the-web-application)
     - [Task 3: Create a Dockerfile](#task-3-create-a-dockerfile)
@@ -46,26 +46,91 @@ Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be 
 
 ## Solution architecture
 
-One host computer with a Linux distribution, to create 3 virtual machines each one will be a node of the Kubernetes cluster.
+One host computer with a Linux distribution RedHat based distribution, to create 3 virtual machines each one will be a node of the Kubernetes cluster.
+In this lab, I have used Fedora, and for the KVM guests are CentOS.
 
-
-The file *centos7-k8s-base.json*:
-
-Values to notice: "disk_size": "5000000", it is in kbytes
-
+![Simplyfied Scheme](media/simply-schema.png)
 ## Requirements
 
-It is simplified in *software* and *hardware* requirements.
+Let's simplify in *software* and *hardware* requirements.
 
 - Software:
 1. Packer
 <https://packer.io/downloads.html>
 2. KVM 
 <https://www.linux-kvm.org/page/Main_Page>
+3. KickStart
+<https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax>
+
+Packer: file related *centos7-k8s-base.json*
+KVM: file related *TODO* (shell script to launch the vms for testing)
+KickStart: file related *c7-kvm-k8s.cfg*
 
 - Hardware:
-1. HD Free space around 15 giga
+1. HD Free space around 15 giga: considering th
 2. RAM around 8 Giga
+
+## Installing Packer
+
+From the hypervisor. Go to <https://releases.hashicorp.com/packer/>, find the latest release (some say this is the best practice).
+Download it and unzip. 
+
+Example:
+```sh
+curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
+
+```
+
+>Notice: Because the packer is already compiled, it is a good practice to verify if the file was perfectly downloaded.
+
+So we can downlaod the signature file and via 
+
+Example:
+
+```sh
+curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS
+curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
+# This one below we don't need because we have downloaded it before
+# curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
+# Verify the signature file is untampered.
+# To create the hashicorp.asc go to <https://www.hashicorp.com/security.html>
+# Get the "-----BEGIN PGP PUBLIC KEY BLOCK-----" until the "-----END PGP PUBLIC KEY BLOCK-----"
+# clean the empty spaces and save the file as hashicorp.asc.
+# Then import the file as follows:
+
+gpg --import hashicorp.asc
+gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
+```
+
+In case you get a Warning like follows.
+We are on the same boat.
+
+Take a look at:
+<https://github.com/hashicorp/packer/issues/8745><br/> 
+
+```text
+born ~/books/experiments/packer_sec_test ~ gpg --import hashicorp.asc
+gpg: key 51852D87348FFC4C: public key "HashiCorp Security <security@hashicorp.com>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+born ~/books/experiments/packer_sec_test ~ gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
+gpg: Signature made Wed Mar 25 22:43:34 2020 GMT
+gpg:                using RSA key 91A6E7F85D05C65630BEF18951852D87348FFC4C
+gpg: Good signature from "HashiCorp Security <security@hashicorp.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 91A6 E7F8 5D05 C656 30BE  F189 5185 2D87 348F FC4C
+born ~/books/experiments/packer_sec_test ~
+
+```
+
+
+# Verify the SHASUM matches the binary.
+shasum -a 256 -c packer_1.5.5_SHA256SUMS
+```
+
+Learn more at: <https://www.hashicorp.com/security/>
+
 
 ## Commands and annotations
 
@@ -76,6 +141,12 @@ When git completes, ssh-agent terminates, and the key is forgotten.
 ```sh
 ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
 ```
+
+Packer template: 
+
+Values to notice: "disk_size": "10000", it is in mbytes. 
+It is around 10 gigabytes.
+
 
 List and Shutdown guest VM KVM command line
 
