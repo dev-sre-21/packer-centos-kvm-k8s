@@ -102,6 +102,7 @@ gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 
 In case you get a Warning like follows.
 We are on the same boat.
+
 ```text
 born ~/books/experiments/packer_sec_test ~ gpg --import hashicorp.asc
 gpg: key 51852D87348FFC4C: public key "HashiCorp Security <security@hashicorp.com>" imported
@@ -119,17 +120,16 @@ born ~/books/experiments/packer_sec_test ~
 ```
 
 Take a look at:
-<https://github.com/hashicorp/packer/issues/8745><br/> 
-
-
+<https://github.com/hashicorp/packer/issues/8745>
 
 
 # Verify the SHASUM matches the binary.
+
+```
 shasum -a 256 -c packer_1.5.5_SHA256SUMS
 ```
 
 Learn more at: <https://www.hashicorp.com/security/>
-
 
 ## Commands and annotations
 
