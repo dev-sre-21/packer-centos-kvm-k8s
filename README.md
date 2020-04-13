@@ -123,7 +123,7 @@ Take a look at:
 <https://github.com/hashicorp/packer/issues/8745>
 
 
-# Verify the SHASUM matches the binary.
+Verify the SHASUM matches the binary.
 
 ```
 shasum -a 256 -c packer_1.5.5_SHA256SUMS
