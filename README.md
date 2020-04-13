@@ -38,7 +38,7 @@
 
 ## Abstract and learning objectives
 
-This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. Also, how to work with remote log administration. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes administration, KVM administration with virsh will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project).
+This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. Also, how to work with remote log administration. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes, KVM administration using *virsh* will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project).
 
 ## Overview
 
@@ -50,18 +50,16 @@ One host computer with a Linux distribution RedHat based distribution, to create
 In this lab, I have used Fedora, and for the KVM guests are CentOS.
 
 ![Simplyfied Scheme](media/simply-schema.png)
+
 ## Requirements
 
 Let's simplify in *software* and *hardware* requirements.
 
 - Software:
 
-1. Packer
-<https://packer.io/downloads.html>
-2. KVM
-<https://www.linux-kvm.org/page/Main_Page>
-3. KickStart
-<https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax>
+1. Packer <https://packer.io/downloads.html>
+2. KVM <https://www.linux-kvm.org/page/Main_Page>
+3. KickStart <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax>
 
 Packer: file related *centos7-k8s-base.json*
 KVM: file related *TODO* (shell script to launch the vms for testing)
@@ -107,19 +105,17 @@ In case you get a Warning like follows.
 We are on the same boat.
 
 ```text
-born ~/books/experiments/packer_sec_test ~ gpg --import hashicorp.asc
+born # gpg --import hashicorp.asc
 gpg: key 51852D87348FFC4C: public key "HashiCorp Security <security@hashicorp.com>" imported
 gpg: Total number processed: 1
 gpg:               imported: 1
-born ~/books/experiments/packer_sec_test ~ gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
+born # gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 gpg: Signature made Wed Mar 25 22:43:34 2020 GMT
 gpg:                using RSA key 91A6E7F85D05C65630BEF18951852D87348FFC4C
 gpg: Good signature from "HashiCorp Security <security@hashicorp.com>" [unknown]
 gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 91A6 E7F8 5D05 C656 30BE  F189 5185 2D87 348F FC4C
-born ~/books/experiments/packer_sec_test ~
-
 ```
 
 Take a look at:
@@ -133,6 +129,10 @@ shasum -a 256 -c packer_1.5.5_SHA256SUMS
 
 Learn more at: <https://www.hashicorp.com/security/>
 
+## Setting up your local environment to run Packer
+
+After the download and verifications. We can the *packer binary*, to a proper location. Like */usr/local/bin*.
+
 ## Commands and annotations
 
 Push to master
@@ -145,7 +145,7 @@ ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.co
 
 Packer template:
 
-Values to notice: "disk_size": "10000", it is in mbytes. 
+Values to notice: "disk_size": "10000", it is in mbytes.
 It is around 10 gigabytes.
 
 List and Shutdown guest VM KVM command line
