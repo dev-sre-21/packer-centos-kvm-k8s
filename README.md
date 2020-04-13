@@ -83,8 +83,6 @@ curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zi
 
 >Notice: Because the packer is already compiled, it is a good practice to verify if the file was perfectly downloaded.
 
-So we can downlaod the signature file and via 
-
 Example:
 
 ```sh
