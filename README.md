@@ -155,15 +155,15 @@ Kickstart missing ? (systemctl enable kubelet && systemctl start kubelet)
 docker info | grep -i cgroup
 
 kubeadm init --apiserver-advertise-address 192.168.100.170
-kubeadm config images pull (beforehand e nao deixa passar nome só IP)
+kubeadm config images pull (e nao deixa passar nome só IP?)
 
-Depois:
+After
 
+```sh
   mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-Tive que criar um user add ao docker group...
+```
 
 Push to master
 
