@@ -93,7 +93,7 @@ Learn more at: <https://www.hashicorp.com/security/>
 
 We can find the PGP like follows at the end of the page.
 
-![](https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/hashicorp_pgp.png?raw=true){:height="50%" width="50%"}
+<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/hashicorp_pgp.png?raw=true" width="350" height="350">
 
 ```sh
 gpg --import hashicorp.asc
