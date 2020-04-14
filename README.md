@@ -88,6 +88,11 @@ curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
 # clean the empty spaces and save the file as hashicorp.asc.
 # Then import the file as follows:
 
+Learn more at: <https://www.hashicorp.com/security/>
+
+We can find the PGP like follows at the end of the page.
+![Simplyfied Scheme](media/hashicorp_pgp.png)
+
 gpg --import hashicorp.asc
 gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 ```
@@ -116,8 +121,6 @@ Verify the SHASUM matches the binary.
 ```sh
 shasum -a 256 -c packer_1.5.5_SHA256SUMS
 ```
-
-Learn more at: <https://www.hashicorp.com/security/>
 
 ## Setting up your local environment to run Packer
 
@@ -158,7 +161,6 @@ Depois:
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 Tive que criar um user add ao docker group...
-
 
 Push to master
 
