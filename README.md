@@ -87,12 +87,14 @@ curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
 # Get the "-----BEGIN PGP PUBLIC KEY BLOCK-----" until the "-----END PGP PUBLIC KEY BLOCK-----"
 # clean the empty spaces and save the file as hashicorp.asc.
 # Then import the file as follows:
+```
 
 Learn more at: <https://www.hashicorp.com/security/>
 
 We can find the PGP like follows at the end of the page.
 ![How it was at April 14](media/hashicorp_pgp.png)
 
+```sh
 gpg --import hashicorp.asc
 gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 ```
