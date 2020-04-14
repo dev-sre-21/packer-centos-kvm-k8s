@@ -11,11 +11,8 @@ set -o pipefail
 #-------------------------------------------------
 date=`date`
 
-echo "Installing VI improved"
-yum -y install screen vim
-
-echo "Installing Docker"
-curl -fsSL https://get.docker.com | bash
+echo "Tools"
+yum -y install tmux screen vim bind-utils
 
 echo "Disable SELinux"
 # setenforce 0 # it is already defined on the KickStart template as permissive
@@ -25,6 +22,15 @@ sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig
 echo "Enable br_netfilter"
 modprobe br_netfilter
 echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+echo "Installing Docker"
+curl -fsSL https://get.docker.com | bash
+
+echo "Starting Docker"
+systemctl enable docker
+
+echo "Check cgroup Docker and kubelet, output must be: Cgroup Driver: cgroupfs"
+docker info | grep -i cgroup > /root/cgroup_check.log
 
 echo "Adding Kubernetes Official repository $date | "
 echo "
@@ -47,4 +53,4 @@ yum install -y kubelet kubeadm kubectl
 
 echo "Restarting the systemd daemon and the kubelet service"
 systemctl daemon-reload
-systemctl restart kubelet
+systemctl enable kubelet
