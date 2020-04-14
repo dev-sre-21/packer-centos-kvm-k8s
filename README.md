@@ -91,7 +91,7 @@ curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
 Learn more at: <https://www.hashicorp.com/security/>
 
 We can find the PGP like follows at the end of the page.
-![Simplyfied Scheme](media/hashicorp_pgp.png)
+![How it was at April 14](media/hashicorp_pgp.png)
 
 gpg --import hashicorp.asc
 gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
