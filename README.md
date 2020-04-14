@@ -225,6 +225,10 @@ sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k
 sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-2
 sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-3
 
+USER=born
+GROUP=born
+sudo chown -R $USER:$GROUP /books/deployment/packer/kvm/packer-centos-kvm-k8s/centos7-k8s-kvm-imgs
+
 VM="centos-kvm-k8s-01"
 DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-1"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
