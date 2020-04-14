@@ -1,5 +1,7 @@
 # Deploy Kubernetes cluster using Packer and Kickstart - Centos hands-on
 
+>PLEASE NOTE: This is a work in progress. We will take some decisions to keep this a bit "hard" and "old school".
+
 ## Contents
 
 <!-- TOC -->
@@ -137,10 +139,26 @@ Setup the VM's configuration automatically.
 
 1. Set the hostnames accordingly
 2. Set up the K8s Master
-3. Set up the log rotation
+3. Set up the log rotation <https://kubernetes.io/docs/concepts/cluster-administration/logging/>
 4. Write a app to maintain the log transference based on the IO operations
 
 Fix the index README.md
+systemctl start docker
+yum install -y kubelet kubeadm kubectl (Falhou no Kickstart?)
+Kickstart missing ? (systemctl enable kubelet && systemctl start kubelet)
+docker info | grep -i cgroup
+
+kubeadm init --apiserver-advertise-address 192.168.100.170
+kubeadm config images pull (beforehand e nao deixa passar nome só IP)
+
+Depois:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Tive que criar um user add ao docker group...
+
 
 Push to master
 
@@ -203,23 +221,23 @@ df -h . | tail -1 | awk '{print $4}'
 echo "You should have at least 30G"
 # lazyness: copying the main image to other vms
 # keeping the orginal for future updates
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-base-img/centos7-k8s-base-1
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-base-img/centos7-k8s-base-2
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-base-img/centos7-k8s-base-3
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-1
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-2
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-3
 
 VM="centos-kvm-k8s-01"
-DISK="./centos7-k8s-base-img/centos7-k8s-base-1"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-1"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 
 # Changed the DISK variable to point to the copy of centos7-k8s-base
 VM="centos-kvm-k8s-02"
-DISK="./centos7-k8s-base-img/centos7-k8s-base-2"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-2"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 
 VM="centos-kvm-k8s-03"
-DISK="./centos7-k8s-base-img/centos7-k8s-base-3"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-3"
 ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 ```
