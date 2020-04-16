@@ -34,14 +34,14 @@ This hands-on lab is designed to guide you through the process of building and d
 
 ## Overview
 
-Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be defined to rotate based on IO operations, and moved to a remote server. The condition to be moved need to respect low IO operations. In other words, if the IO operations are lower than 30% the rotate logs should be moved to a remote server. 
+Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be defined to rotate based on IO operations, and moved to a remote server. The condition to be moved need to respect low IO operations. In other words, if the IO operations are lower than 30% the rotate logs should be moved to a remote server.
 
 ## Solution architecture
 
 One host computer with a Linux distribution RedHat based distribution, to create 3 virtual machines each one will be a node of the Kubernetes cluster.
 In this lab, I have used Fedora, and for the KVM guests are CentOS.
 
-![Simplyfied Scheme](media/simply-schema.png)
+<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true" width="350" height="350">
 
 ## Requirements
 
@@ -67,13 +67,17 @@ KickStart: file related *c7-kvm-k8s.cfg*<br\>
 From the hypervisor. Go to <https://releases.hashicorp.com/packer/>, find the latest release (some say this is the best practice).
 Download it and unzip.
 
-Example:
+Example using curl and unzip:
 
 ```sh
 curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
+unzip packer_1.5.5_linux_amd64.zip
 ```
 
 >Notice: Because the packer is already compiled, it is a good practice to verify if the file was perfectly downloaded.
+
+Hashicorp provides hash (using Secure Hash Algorithm 256) files that you can use to verify your download.
+So you can download the files as follows:
 
 Example:
 
@@ -91,7 +95,7 @@ curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
 
 Learn more at: <https://www.hashicorp.com/security/>
 
-We can find the PGP like follows at the end of the page.
+We can find the PGP going to the end of the page.
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/hashicorp_pgp.png?raw=true" width="350" height="350">
 
@@ -100,7 +104,7 @@ gpg --import hashicorp.asc
 gpg --verify packer_1.5.5_SHA256SUMS.sig packer_1.5.5_SHA256SUMS
 ```
 
-In case you get a Warning like follows. We are on the same boat.
+In case you get a *Warning* like follows. We are on the same boat.
 
 ```text
 born # gpg --import hashicorp.asc
@@ -117,6 +121,7 @@ Primary key fingerprint: 91A6 E7F8 5D05 C656 30BE  F189 5185 2D87 348F FC4C
 ```
 
 Take a look at:
+
 <https://github.com/hashicorp/packer/issues/8745>
 
 Verify the SHASUM matches the binary.
@@ -127,7 +132,7 @@ shasum -a 256 -c packer_1.5.5_SHA256SUMS
 
 ## Setting up your local environment to run Packer
 
-After the download and verifications. We can the *packer binary*, to a proper location, like: */usr/local/bin*.
+After the download and verifications. We can **move** or **copy** the *packer binary*, to a proper location that is visible from your execution PATH variable at your operating system, like: */usr/local/bin*.
 
 ## Clone the repository
 
@@ -147,30 +152,23 @@ Setup the VM's configuration automatically.
 2. Set up the K8s Master
 3. Set up the log rotation <https://kubernetes.io/docs/concepts/cluster-administration/logging/>
 4. Write a app to maintain the log transference based on the IO operations
+5. Add user and set the home directory
 
 Fix the index README.md
 systemctl start docker
-yum install -y kubelet kubeadm kubectl (Falhou no Kickstart?)
+yum install -y kubelet kubeadm kubectl (Kickstart has failed. ?)
 Kickstart missing ? (systemctl enable kubelet && systemctl start kubelet)
 docker info | grep -i cgroup
 
 kubeadm init --apiserver-advertise-address 192.168.100.170
 kubeadm config images pull (e nao deixa passar nome só IP?)
 
-After
+After:
 
 ```sh
   mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
-```
-
-Push to master
-
-When git completes, ssh-agent terminates, and the key is forgotten.
-
-```sh
-ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
 ```
 
 Packer template:
@@ -251,6 +249,60 @@ ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 ```
 
+## Snapshot images and revert to previous state
+
+```sh
+# Snapshot the images in case you want to get back to the previous state
+sudo virsh snapshot-create-as --domain "centos-kvm-k8s-01" --name centos-kvm-k8s-01_state_0
+# Revert to the previous state
+sudo virsh snapshot-revert --domain "centos-kvm-k8s-01" --snapshotname centos-kvm-k8s-01_state_0 --running
+# To list snapshots
+virsh snapshot-list --domain "centos-kvm-k8s-01"
+```
+
 - References
 
 - Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
+
+When git completes, ssh-agent terminates, and the key is forgotten.
+
+```sh
+ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
+```
+
+## I need to think about
+
+adduser born  OR    echo "born:x:1000:1000::/home/born:/bin/bash" >> /etc/passwd
+passwd born   OR    echo "born:$6$PqOMZg/D$o0qQqJs9tBsWrHerTMRsXqyU1sUPqwDZja1rF5/Z4zXp40T/ukrZjCCt0oP1R4u5u0KHsTkFSpzcYq6Ra9SP4/:18368:0:99999:7:::" >> /dev/shadow
+
+echo "born    ALL=(ALL)       ALL" >> /etc/sudoers
+grep born /etc/sudoers
+
+hostnamectl set-hostname centos-kvm-k8s-03
+usermod -aG docker born
+
+## Add this on kickstart post-install script
+
+I need to get back here and think a bit about it.
+
+```sh
+ip_dhcp_lease=$(ip a  show dev eth0  | grep -o -E '([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}' | head -1)
+echo "$ip_dhcp_lease  $(hostname)" >> /etc/hosts
+```
+
+```sh
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown -R  $(id -u):$(id -g) $HOME/.kube/config
+sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig ~/.kube/config
+```
+
+## Two stages
+
+First for Master node then Worker nodes?
+
+Workers nodes
+
+```sh
+kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
+```
