@@ -15,8 +15,8 @@ echo "Tools"
 yum -y install tmux screen vim bind-utils
 
 echo "Disable and Stop FirewallD"
-systemctl disabled firewalld
 systemctl stop firewalld
+systemctl disable firewalld
 
 echo "Disable SELinux"
 # setenforce 0 # it is already defined on the KickStart template as permissive
