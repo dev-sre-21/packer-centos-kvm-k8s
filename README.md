@@ -12,25 +12,25 @@
   - [Solution architecture](#solution-architecture)
   - [Requirements](#requirements)
   - [Main task 1: Installing Packer](#installing-packer)
-    - [Task 1: Setting up your local environment to run Packer](#setting-up-your-local-environment-to-run-packer)
-    - [Task 2: xxxxx](#task-2-browsing-to-the-web-application)
-    - [Task 3: xxxxx](#task-3-create-a-dockerfile)
-  - [Main task 2: xx](#exercise-2-deploy-the-solution-to-azure-kubernetes-service)
-    - [Task 1: xxxxx](#task-1-tunnel-into-the-azure-kubernetes-service-cluster)
-    - [Task 2: xxxxx](#task-2-deploy-a-service-using-the-kubernetes-management-dashboard)
-  - [Exercise 3: xxx](#exercise-3-scale-the-application-and-test-ha)
+    - [Task 1: Verify Packer Downlaod](#verify-packer-download)
+    - [Task 2: Setting up your local environment to run Packer](#setting-up-your-local-environment-to-run-packer)
+    - [Task 3: Clone the repository](#clone-the-repository)
+  - [Main task 1: Setup your variables](#setup-your-variables)
+    - [Task 1: Execute Packer](#execute-packer)
+    - [Task 2: Observe the logs](#observe-the-logs)
+    - [Task 3: Observe via VNC the OS console](#observe-via-vnc-the-os-console)
+  - [Exercise 3: Clone the repository](#clone-the-repository)
     - [Task 1: xxxxx](#task-1-increase-service-instances-from-the-kubernetes-dashboard)
   - [Exercise 4: xxx](#exercise-4-working-with-services-and-routing-application-traffic)
     - [Task 1: xxxxx](#task-1-scale-a-service-without-port-constraints)
     - [Task 2: Update an external service to support dynamic discovery with a load balancer](#task-2-update-an-external-service-to-support-dynamic-discovery-with-a-load-balancer)
-    - [Task 3: xxxxx](#task-3-adjust-cpu-constraints-to-improve-scale)
   - [After the hands-on lab](#after-the-hands-on-lab)
 
 <!-- /TOC -->
 
 ## Abstract and learning objectives
 
-This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes, KVM administration using *virsh* will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project). This is not an up to date best practice for provisioning.
+This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart on a KVM Hypervisor. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes, KVM administration using *virsh* will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project). This is not an up to date best practice for provisioning.
 
 ## Overview
 
@@ -44,7 +44,7 @@ This overview is an example that depicts how to create infrastructure during a p
 
 ## Solution architecture
 
-One host computer with a Linux distribution RedHat based distribution, to create three virtual machines, each one will be a node of the Kubernetes cluster.
+One host computer with a Linux RedHat based distribution, to create three virtual machines, each one will be a node of the Kubernetes cluster.
 For this lab, I have used Fedora, and for the KVM guests are CentOS.
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true" width="350" height="350">
@@ -79,6 +79,8 @@ Example using curl and unzip:
 curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip 
 unzip packer_1.5.5_linux_amd64.zip
 ```
+
+## Verify Packer download
 
 >Notice: Because the packer is already compiled, it is a good practice to verify if the file was perfectly downloaded.
 
@@ -146,9 +148,129 @@ After the download and verifications. We can **move** or **copy** the *packer bi
 
 ## Clone the repository
 
+```sh
+clone https://github.com/dev-sre-21/packer-centos-kvm-k8s.git
+```
+
 ## Set your own variables
 
-## Launch your KVM guest
+## Execute Packer
+
+```sh
+packer build centos7-k8s-base.json
+```
+
+## Observe the logs
+
+This step is **optional**.
+
+## Observe via VNC the OS console
+
+This step is **optional**.
+
+## Launch your KVM guests
+
+So, to create the KVM guest we need to add this paths to the command line composition as follows:
+
+>Plese note: check if you have enough space
+
+```sh
+df -h . | tail -1 | awk '{print $4}'
+echo "You should have at least 30G"
+```
+
+## Keeping the orginal image for future updates
+
+Here we are making a copy of the image for each virtual machine we will use.
+This way we can keep the orginal image and update it as needed without touch on the virtual machine images.
+
+```ssh
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-1
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-2
+sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-3
+```
+
+## Change the the images owner to qemu, so the virtual machines will be created.
+
+```ssh
+USER=qemu
+GROUP=qemu
+sudo chown -R $USER:$GROUP /books/deployment/packer/kvm/packer-centos-kvm-k8s/centos7-k8s-kvm-imgs
+```
+
+Launch the virtual machines (three in total)
+
+```sh
+VM="centos-kvm-k8s-01"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-1"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+
+
+VM="centos-kvm-k8s-02"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-2"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+
+VM="centos-kvm-k8s-03"
+DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-3"
+ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
+sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
+```
+
+## Getting the guest's IP address from the virtual machines
+
+*default* here is the network name
+
+```sh
+sudo virsh net-list # Get the network name
+sudo virsh net-dhcp-leases default
+```
+
+## Set hostname
+
+We need to setup the hostname from the vms and set those IP address on their "/etc/hosts" file.
+The shell command bellow need gets the IP from the virtual machines and apply an change on the hostnames.
+
+The VM prefix is set to on the variable *VM_Prefix*. In the exaple it is set as "centos-kvm-k8s-0"
+
+```sh
+VM_Prefix=centos-kvm-k8s-0
+for a in $(sudo virsh net-dhcp-leases default | awk '{print $5}' | grep -o -E '([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}');
+  do
+    ((i=i+1));
+    echo ssh root@$a -f hostnamectl set-hostsname $VM_Prefix$i;
+done
+```
+
+The result will be an execution of the commands as follows:
+
+```text
+ssh root@192.168.100.205 -f hostnamectl set-hostsname centos-kvm-k8s-01
+ssh root@192.168.100.245 -f hostnamectl set-hostsname centos-kvm-k8s-02
+ssh root@192.168.100.176 -f hostnamectl set-hostsname centos-kvm-k8s-03
+```
+
+## Adding a user, setting user password and adding to the docker operating system user group
+
+We have to add an administative user to the virtual machines, and set the user group.
+
+```sh
+USER_NAME=born
+adduser $USER_NAME
+echo "born:$6$PqOMZg/D$o0qQqJs9tBsWrHerTMRsXqyU1sUPqwDZja1rF5/Z4zXp40T/ukrZjCCt0oP1R4u5u0KHsTkFSpzcYq6Ra9SP4/:18368:0:99999:7:::" >> /dev/shadow
+echo "born    ALL=(ALL)       ALL" >> /etc/sudoers
+usermod -aG docker born
+```
+
+## On the master
+
+```sh
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown -R  $(id -u):$(id -g) $HOME/.kube/config
+sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig ~/.kube/config
+```
 
 ## Commands and annotations
 
@@ -158,11 +280,10 @@ After the download and verifications. We can **move** or **copy** the *packer bi
 
 Setup the VM's configuration automatically.
 
-1. Set the hostnames accordingly
-2. Set up the K8s Master
-3. Set up the log rotation <https://kubernetes.io/docs/concepts/cluster-administration/logging/>
-4. Write a app to maintain the log transference based on the IO operations
-5. Add user and set the home directory
+1. Set up the K8s Master
+2. Set up the log rotation <https://kubernetes.io/docs/concepts/cluster-administration/logging/>
+3. Write a app to maintain the log transference based on the IO operations
+4. Add user and set the home directory
 
 Fix the index README.md
 systemctl start docker
@@ -181,6 +302,16 @@ After:
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
+## Two stages
+
+First for Master node then Worker nodes?
+
+Workers nodes
+
+```sh
+kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
+```
+
 Packer template:
 
 >Values to notice: "disk_size": "10000", it is in mbytes.
@@ -191,15 +322,6 @@ List and Shutdown guest VM KVM command line
 ```sh
 sudo virsh list # it will show the guests running, to list all the guests add --all at the end
 sudo virsh shutdown 11 --mode acpi
-```
-
-Getting the guest's IP address
-
-*default* here is the network name
-
-```sh
-sudo virsh net-list # Get the network name
-sudo virsh net-dhcp-leases default
 ```
 
 Check the possible --os-variant OS
@@ -220,7 +342,7 @@ The disk:
 And
 
 ```text
-The downloaded ISO
+The downloaded location for the Operating System ISO
 ./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso
 ```
 
@@ -229,36 +351,6 @@ So, to create the KVM guest we need to add this paths to the command line compos
 > Notice: Plus the VM name.
 
 ```sh
-# check if you have enough space
-df -h . | tail -1 | awk '{print $4}'
-echo "You should have at least 30G"
-# lazyness: copying the main image to other vms
-# keeping the orginal for future updates
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-1
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-2
-sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-3
-
-USER=qemu
-GROUP=qemu
-sudo chown -R $USER:$GROUP /books/deployment/packer/kvm/packer-centos-kvm-k8s/centos7-k8s-kvm-imgs
-
-VM="centos-kvm-k8s-01"
-DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-1"
-ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
-sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
-
-# Changed the DISK variable to point to the copy of centos7-k8s-base
-VM="centos-kvm-k8s-02"
-DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-2"
-ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
-sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
-
-VM="centos-kvm-k8s-03"
-DISK="./centos7-k8s-kvm-imgs/centos7-k8s-base-3"
-ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
-sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
-```
-
 ## Snapshot images and revert to previous state
 
 ```sh
@@ -278,43 +370,6 @@ When git completes, ssh-agent terminates, and the key is forgotten.
 
 ```sh
 ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
-```
-
-## I need to think about
-
-adduser born  OR    echo "born:x:1000:1000::/home/born:/bin/bash" >> /etc/passwd
-passwd born   OR    echo "born:$6$PqOMZg/D$o0qQqJs9tBsWrHerTMRsXqyU1sUPqwDZja1rF5/Z4zXp40T/ukrZjCCt0oP1R4u5u0KHsTkFSpzcYq6Ra9SP4/:18368:0:99999:7:::" >> /dev/shadow
-
-echo "born    ALL=(ALL)       ALL" >> /etc/sudoers
-grep born /etc/sudoers
-
-hostnamectl set-hostname centos-kvm-k8s-03
-usermod -aG docker born
-
-## Add this on kickstart post-install script
-
-I need to get back here and think a bit about it.
-
-```sh
-ip_dhcp_lease=$(ip a  show dev eth0  | grep -o -E '([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}' | head -1)
-echo "$ip_dhcp_lease  $(hostname)" >> /etc/hosts
-```
-
-```sh
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown -R  $(id -u):$(id -g) $HOME/.kube/config
-sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig ~/.kube/config
-```
-
-## Two stages
-
-First for Master node then Worker nodes?
-
-Workers nodes
-
-```sh
-kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
 ```
 
 ## Install Helm
