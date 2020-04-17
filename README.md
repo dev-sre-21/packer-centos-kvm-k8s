@@ -30,22 +30,28 @@
 
 ## Abstract and learning objectives
 
-This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. Also, how to work with remote log administration. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes, KVM administration using *virsh* will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project).
+This hands-on lab is designed to guide you through the process of building and deploying a Kubernetes Cluster using Packer and KickStart. This document is under development, and some commands and details are being added without a proper organization. Things like: commands for Kubernetes, KVM administration using *virsh* will be spread all around. (service scale-out, and high-availability, monitoring and trancing, will be the next project). This is not an up to date best practice for provisioning.
 
 ## Overview
 
-Launch a Kubernetes cluster with three nodes, using CentOS. The logs have to be defined to rotate based on IO operations, and moved to a remote server. The condition to be moved need to respect low IO operations. In other words, if the IO operations are lower than 30% the rotate logs should be moved to a remote server.
+The document explain how to launch a Kubernetes cluster with three nodes, via command line using Packer and KickStart. 
+
+Packer is an application created by Hashicorp, that makes use of templates in JSON format. The Packer's template has the instructions to download the operating system image, specifications regarding the virtual machine, and as optional definition a post-install script.
+
+KickStart takes place to manage the virtual machine definitions in a fine-grained manner. For instance, how the virtual machine disk should be partitioned, unnecessary firmware removal, disabling services from *systemd*. KickStart has numerous variety of use. To learn more: <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user>
+
+This overview is an example that depicts how to create infrastructure during a phase of transition. This model was standard during the transformation between the *past view* that I call "the system admin phase" and the evolution of pipelines focused on "deliver what the developers need."
 
 ## Solution architecture
 
-One host computer with a Linux distribution RedHat based distribution, to create 3 virtual machines each one will be a node of the Kubernetes cluster.
-In this lab, I have used Fedora, and for the KVM guests are CentOS.
+One host computer with a Linux distribution RedHat based distribution, to create three virtual machines, each one will be a node of the Kubernetes cluster.
+For this lab, I have used Fedora, and for the KVM guests are CentOS.
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true" width="350" height="350">
 
 ## Requirements
 
-Let's simplify in *software* and *hardware* requirements.
+Let's simplify the context in *software* and *hardware* requirements.
 
 - Software:
 
@@ -305,4 +311,63 @@ Workers nodes
 
 ```sh
 kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
+```
+
+## Install Helm
+
+"Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
+Charts are easy to create, version, share, and publish — so start using Helm and stop the copy-and-paste.
+
+The latest version of Helm is maintained by the CNCF - in collaboration with Microsoft, Google, Bitnami and the Helm contributor community.
+Helm's default list of public repositories is initially empty. Now let's add the Google chart repo, and start using it."
+
+>Quoted from: <https://v2.helm.sh/>
+
+```sh
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+```
+
+## Install Helm repository
+
+```sh
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+```
+
+Verify the repository added.
+
+```sh
+helm search repo redis
+```
+
+The command should output:
+
+```text
+NAME    URL
+stable  https://kubernetes-charts.storage.googleap
+```
+
+The Helm command defaults to discovering the host already set in ~/.kube/config. It is possible to change or override the host.
+The next step gets right to it by installing a pre-made chart.
+
+```sh
+kubectl -n kube-system create serviceaccount tiller
+```
+
+```sh
+kubectl create clusterrolebinding tiller \
+  --clusterrole=cluster-admin \
+  --serviceaccount=kube-system:tiller
+```
+
+```sh
+helm init --service-account tiller
+```
+
+```sh
+# Users in China: You will need to specify a specific tiller-image in order to initialize tiller. 
+# The list of tiller image tags are available here: https://dev.aliyun.com/detail.html?spm=5176.1972343.2.18.ErFNgC&repoId=62085. 
+# When initializing tiller, you'll need to pass in --tiller-image
+
+helm init --service-account tiller \
+--tiller-image registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:<tag>
 ```
