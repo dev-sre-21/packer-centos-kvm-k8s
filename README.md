@@ -152,7 +152,17 @@ After the download and verifications. We can **move** or **copy** the *packer bi
 clone https://github.com/dev-sre-21/packer-centos-kvm-k8s.git
 ```
 
-## Set your own variables
+## Setup your variables
+
+Open the file *centos7-k8s-base.json* and set the variables iso and *checksum* accordingly. In short, pick a url ISO near to your location for the sake of a low latency network.
+
+```json
+{
+  "variables": {
+    "iso": "http://centos.mirror.garr.it/centos/7.7.1908/isos/x86_64/CentOS-7-x86_64-Minimal-1908.iso",
+    "checksum": "9a2c47d97b9975452f7d582264e9fc16d108ed8252ac6816239a3b58cef5c53d"
+  },
+```
 
 ## Execute Packer
 
@@ -162,11 +172,13 @@ packer build centos7-k8s-base.json
 
 ## Observe the logs
 
-This step is **optional**.
+This step is **optional**. During the packer build.
 
 ## Observe via VNC the OS console
 
-This step is **optional**.
+This step is **optional**. It is possible to connect via vnc to the hypervisor and see the VM actions.
+
+<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/packer_wait_ssh.png?raw=true" width="350" height="350">
 
 ## Launch your KVM guests
 
@@ -351,82 +363,10 @@ So, to create the KVM guest we need to add this paths to the command line compos
 > Notice: Plus the VM name.
 
 ```sh
-## Snapshot images and revert to previous state
-
-```sh
 # Snapshot the images in case you want to get back to the previous state
 sudo virsh snapshot-create-as --domain "centos-kvm-k8s-01" --name centos-kvm-k8s-01_state_0
 # Revert to the previous state
 sudo virsh snapshot-revert --domain "centos-kvm-k8s-01" --snapshotname centos-kvm-k8s-01_state_0 --running
 # To list snapshots
 virsh snapshot-list --domain "centos-kvm-k8s-01"
-```
-
-- References
-
-- Push to master -  <https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
-
-When git completes, ssh-agent terminates, and the key is forgotten.
-
-```sh
-ssh-agent bash -c 'ssh-add ~/.ssh/packer-centos7-kvm-k8s; git push git@github.com:dev-sre-21/packer-centos-kvm-k8s.git'
-```
-
-## Install Helm
-
-"Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
-Charts are easy to create, version, share, and publish — so start using Helm and stop the copy-and-paste.
-
-The latest version of Helm is maintained by the CNCF - in collaboration with Microsoft, Google, Bitnami and the Helm contributor community.
-Helm's default list of public repositories is initially empty. Now let's add the Google chart repo, and start using it."
-
->Quoted from: <https://v2.helm.sh/>
-
-```sh
-curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-```
-
-## Install Helm repository
-
-```sh
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-```
-
-Verify the repository added.
-
-```sh
-helm search repo redis
-```
-
-The command should output:
-
-```text
-NAME    URL
-stable  https://kubernetes-charts.storage.googleap
-```
-
-The Helm command defaults to discovering the host already set in ~/.kube/config. It is possible to change or override the host.
-The next step gets right to it by installing a pre-made chart.
-
-```sh
-kubectl -n kube-system create serviceaccount tiller
-```
-
-```sh
-kubectl create clusterrolebinding tiller \
-  --clusterrole=cluster-admin \
-  --serviceaccount=kube-system:tiller
-```
-
-```sh
-helm init --service-account tiller
-```
-
-```sh
-# Users in China: You will need to specify a specific tiller-image in order to initialize tiller. 
-# The list of tiller image tags are available here: https://dev.aliyun.com/detail.html?spm=5176.1972343.2.18.ErFNgC&repoId=62085. 
-# When initializing tiller, you'll need to pass in --tiller-image
-
-helm init --service-account tiller \
---tiller-image registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:<tag>
 ```
