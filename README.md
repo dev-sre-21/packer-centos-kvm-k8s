@@ -178,7 +178,7 @@ This step is **optional**. During the packer build.
 
 This step is **optional**. It is possible to connect via vnc to the hypervisor and see the VM actions.
 
-<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/packer_wait_ssh.png?raw=true" width="350" height="350">
+<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/packer_wait_ssh.png?raw=true" width="600" height="300">
 
 ## Launch your KVM guests
 
