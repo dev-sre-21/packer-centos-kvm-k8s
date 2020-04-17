@@ -180,11 +180,15 @@ This step is **optional**. It is possible to connect via vnc to the hypervisor a
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/packer_wait_ssh.png?raw=true" width="600" height="300">
 
+>Please note the line: **qemu: vnc://127.0.0.1:5959**
+
 ## Launch your KVM guests
 
 So, to create the KVM guest we need to add this paths to the command line composition as follows:
 
 >Plese note: check if you have enough space
+
+So, you can use a VNC cliente and check what is going on during the virtual machine installation.
 
 ```sh
 df -h . | tail -1 | awk '{print $4}'
