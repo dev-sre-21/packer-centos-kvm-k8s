@@ -19,11 +19,11 @@
     - [Task 1: Execute Packer](#execute-packer)
     - [Task 2: Observe the logs](#observe-the-logs)
     - [Task 3: Observe via VNC the OS console](#observe-via-vnc-the-os-console)
-  - [Exercise 3: Clone the repository](#clone-the-repository)
-    - [Task 1: xxxxx](#task-1-increase-service-instances-from-the-kubernetes-dashboard)
-  - [Exercise 4: xxx](#exercise-4-working-with-services-and-routing-application-traffic)
-    - [Task 1: xxxxx](#task-1-scale-a-service-without-port-constraints)
-    - [Task 2: Update an external service to support dynamic discovery with a load balancer](#task-2-update-an-external-service-to-support-dynamic-discovery-with-a-load-balancer)
+  - [Exercise 3: Launch your KVM guests](#launch-your-kvm-guests)
+    - [Task 1: Keeping the orginal image for future updates](#keeping-the-orginal-image-for-future-updates)
+  - [Exercise 4: Setup the images](#setup-the-images)
+    - [Task 1: List guest IP](#list-guest-ip)
+    - [Task 2: Set hostname on the virtual machines](#set-hostname-on-the-virtual-machines)
   - [After the hands-on lab](#after-the-hands-on-lab)
 
 <!-- /TOC -->
@@ -206,7 +206,9 @@ sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k
 sudo cp ./centos7-k8s-base-img/centos7-k8s-base ./centos7-k8s-kvm-imgs/centos7-k8s-base-3
 ```
 
-## Change the the images owner to qemu, so the virtual machines will be created.
+## Setup the images
+
+Change the images owner to qemu, so the virtual machines will be created.
 
 ```ssh
 USER=qemu
@@ -234,7 +236,9 @@ ISO="./packer_cache/4643e65b1345d2b22536e5d371596b98120f4251.iso"
 sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk $DISK,format=qcow2,bus=virtio --disk $ISO,device=cdrom --network bridge=virbr0,model=virtio --os-type=linux --os-variant=centos7.0 --graphics spice --noautoconsole
 ```
 
-## Getting the guest's IP address from the virtual machines
+## List guest IP
+
+Getting the guest's IP address from the virtual machines.
 
 *default* here is the network name
 
@@ -243,7 +247,7 @@ sudo virsh net-list # Get the network name in my case it is "default"
 sudo virsh net-dhcp-leases default
 ```
 
-## Set hostname
+## Set hostname on the virtual machines
 
 We need to setup the hostname from the vms and set those IP address on their "/etc/hosts" file.
 The shell command bellow need gets the IP from the virtual machines and apply an change on the hostnames.
@@ -270,6 +274,7 @@ ssh root@192.168.100.176 -f hostnamectl set-hostsname centos-kvm-k8s-03
 ## Adding a user, setting user password and adding to the docker operating system user group
 
 We have to add an administative user to the virtual machines, and set the user group.
+**That will not work remotelly with the /etc/shadow file**
 
 ```sh
 USER_NAME=born
