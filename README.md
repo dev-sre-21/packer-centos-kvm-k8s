@@ -38,7 +38,7 @@ The document explain how to launch a Kubernetes cluster with three nodes, via co
 
 Packer is an application created by Hashicorp, that makes use of templates in JSON format. The Packer's template has the instructions to download the operating system image, specifications regarding the virtual machine, and as optional definition a post-install script.
 
-KickStart takes place to manage the virtual machine definitions in a fine-grained manner. For instance, how the virtual machine disk should be partitioned, unnecessary firmware removal, disabling services from *systemd*. KickStart has numerous variety of use. To learn more: <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user>
+KickStart takes place to manage the virtual machine definitions in a fine-grained manner. For instance, how the virtual machine disk should be partitioned, unnecessary firmware removal, disabling services from *systemd*. KickStart has numerous variety of use. To learn more: [KickStart - RedHat reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user)
 
 This overview is an example that depicts how to create infrastructure during a phase of transition. This model was standard during the transformation between the *past view* that I call "the system admin phase" and the evolution of pipelines focused on "deliver what the developers need."
 
@@ -76,7 +76,7 @@ Download it and unzip.
 Example using curl and unzip:
 
 ```sh
-curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
+curl -LO https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip 
 unzip packer_1.5.5_linux_amd64.zip
 ```
 
@@ -85,25 +85,29 @@ unzip packer_1.5.5_linux_amd64.zip
 Hashicorp provides hash (using Secure Hash Algorithm 256) files that you can use to verify your download.
 So you can download the files as follows:
 
-Example:
-
 ```sh
 curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS
 curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_SHA256SUMS.sig
 # This one below we don't need because we have downloaded it before
 # curl -Os https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip
-# Verify the signature file is untampered.
-# To create the hashicorp.asc go to <https://www.hashicorp.com/security.html>
+# Verify the signature file is untampered. In order to do this you will need to create a public key.
+#
+# To create the public key as: hashicorp.asc go to <https://www.hashicorp.com/security.html>
 # Get the "-----BEGIN PGP PUBLIC KEY BLOCK-----" until the "-----END PGP PUBLIC KEY BLOCK-----"
-# clean the empty spaces and save the file as hashicorp.asc.
+# Then clean the empty spaces and save the file as hashicorp.asc.
 # Then import the file as follows:
 ```
 
 Learn more at: <https://www.hashicorp.com/security/>
 
-We can find the PGP going to the end of the page.
+> Please note: We can find the PGP going to the end of the page. And the file should be like the picture.
+One blank line bellow the line **-----BEGIN PGP PUBLIC KEY BLOCK-----** and no empty lines or blank spaces until the end.
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/hashicorp_pgp.png?raw=true" width="350" height="350">
+
+## Importing the public GPG key to your environment
+
+The first command import and the second command verifies the signature from the file.
 
 ```sh
 gpg --import hashicorp.asc
