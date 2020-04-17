@@ -12,7 +12,7 @@ set -o pipefail
 date=`date`
 
 echo "Tools"
-yum -y install tmux screen vim bind-utils
+yum -y install tmux screen vim bind-utils git
 
 echo "Disable and Stop FirewallD"
 systemctl stop firewalld
