@@ -239,7 +239,7 @@ sudo virt-install --import --name $VM --memory 2048 --vcpus 2 --cpu host --disk 
 *default* here is the network name
 
 ```sh
-sudo virsh net-list # Get the network name
+sudo virsh net-list # Get the network name in my case it is "default"
 sudo virsh net-dhcp-leases default
 ```
 
@@ -281,11 +281,29 @@ usermod -aG docker born
 
 ## On the master
 
+Using root user:
+
+```sh
+kubeadm init --apiserver-advertise-address 192.168.100.170
+```
+
+Verify the output result to execute after on the virtual machines that will be the workers nodes.
+
 ```sh
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown -R  $(id -u):$(id -g) $HOME/.kube/config
+
+# Installing Flannel for network support on K8s.
 sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig ~/.kube/config
+```
+
+## Make the Workers join the cluster
+
+Using the administrative user.
+
+```sh
+kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
 ```
 
 ## Commands and annotations
@@ -317,18 +335,6 @@ After:
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
-
-## Two stages
-
-First for Master node then Worker nodes?
-
-Workers nodes
-
-```sh
-kubeadm join 192.168.100.245:6443 --token 0zor7p.2z5zs0hbpms1299z --discovery-token-ca-cert-hash sha256:4587252951dd3507a81325eed15926d355527746cfc8d0c7cda1f648ea8e7666
-```
-
-Packer template:
 
 >Values to notice: "disk_size": "10000", it is in mbytes.
 It is around 10 gigabytes.
