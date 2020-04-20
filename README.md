@@ -34,18 +34,18 @@ This hands-on lab is designed to guide you through the process of building and d
 
 ## Overview
 
-The document explain how to launch a Kubernetes cluster with three nodes, via command line using Packer and KickStart. 
+The document explain how to launch a Kubernetes cluster with three nodes, via command line using Packer and KickStart.
 
-Packer is an application created by Hashicorp, that makes use of templates in JSON format. The Packer's template has the instructions to download the operating system image, specifications regarding the virtual machine, and as optional definition a post-install script.
+Packer is an application created by Hashicorp that makes use of templates in JSON format to provision operating system images. The Packer's template has the instructions to download the operating system image and specifications regarding the virtual machine resources. Additionally, the template can have directives pointing to post-install scripts. The post-install scripts can be used to change configurations files or to install new applications to the operating system image. In short, if you want to have an HTTP server (Apache or NGINX), it is possible to add this to the post-install script. The scrip will run during the provisioning state and be added to the operating system image at the end.
 
-KickStart takes place to manage the virtual machine definitions in a fine-grained manner. For instance, how the virtual machine disk should be partitioned, unnecessary firmware removal, disabling services from *systemd*. KickStart has numerous variety of use. To learn more: [KickStart - RedHat reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user)
+KickStart takes place to manage the virtual machine definitions in a fine-grained manner. For instance, how the virtual machine disk should be partitioned, unnecessary firmware removal, disabling services from *systemd*. KickStart has numerous variety of use. To learn more please go to: [KickStart - RedHat reference](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user)
 
-This overview is an example that depicts how to create infrastructure during a phase of transition. This model was standard during the transformation between the *past view* that I call "the system admin phase" and the evolution of pipelines focused on "deliver what the developers need."
+This overview is an example that depicts how to create infrastructure during a "transition phase." This model was standard during the transformation between the *past techniques* that I call "the system admin phase" and the evolution of pipelines focused on "deliver what the developers need.", via code and operations.
 
 ## Solution architecture
 
 One host computer with a Linux RedHat based distribution, to create three virtual machines, each one will be a node of the Kubernetes cluster.
-For this lab, I have used Fedora, and for the KVM guests are CentOS.
+For this lab, I have used Fedora, and for the KVM guests CentOS.
 
 <img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true" width="350" height="350">
 
@@ -271,7 +271,7 @@ ssh root@192.168.100.245 -f hostnamectl set-hostsname centos-kvm-k8s-02
 ssh root@192.168.100.176 -f hostnamectl set-hostsname centos-kvm-k8s-03
 ```
 
-## Adding a user, setting user password and adding to the docker operating system user group
+## Adding a user, setting up user password and adding to the docker operating system user group
 
 We have to add an administative user to the virtual machines, and set the user group.
 **That will not work remotelly with the /etc/shadow file**
