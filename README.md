@@ -65,8 +65,8 @@ KickStart: file related *c7-kvm-k8s.cfg*<br\>
 
 - Hardware:
 
-1. HD Free space around 15 giga: considering the three VMs that will host Master, the two K8s Nodes.
-2. RAM around 8 Giga
+1. HD Free space around 15 Giga: considering the three VMs, we will have one Master node and two K8s worker nodes
+2. Around 8 Giga free RAM. So each vm will get 2 Giga RAM (6 Giga RAM in total). I am considering to leave 2 Giga of RAM to the Host Operting System (hypervisor)
 
 ## Installing Packer
 
@@ -289,7 +289,7 @@ usermod -aG docker born
 Using root user:
 
 ```sh
-kubeadm init --apiserver-advertise-address 192.168.100.170
+kubeadm init --apiserver-advertise-address 192.168.100.176
 ```
 
 Verify the output result to execute after on the virtual machines that will be the workers nodes.
