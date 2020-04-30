@@ -47,7 +47,9 @@ This overview is an example that depicts how to create infrastructure during a "
 One host computer with a Linux RedHat based distribution, to create three virtual machines, each one will be a node of the Kubernetes cluster.
 For this lab, I have used Fedora, and for the KVM guests CentOS.
 
-<img src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true" width="350" height="350" align="center">
+<p align="center">
+  <img width="350" height="350" src="https://github.com/dev-sre-21/packer-centos-kvm-k8s/blob/master/media/simply-schema.png?raw=true">
+</p>
 
 ## Requirements
 
