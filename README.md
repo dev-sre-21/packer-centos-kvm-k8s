@@ -286,10 +286,12 @@ usermod -aG docker born
 
 ## On the master
 
+I have elected the host with the IP address "192.168.100.245" to be the *Master Node*.
+
 Using root user:
 
 ```sh
-kubeadm init --apiserver-advertise-address 192.168.100.176
+kubeadm init --apiserver-advertise-address 192.168.100.245
 ```
 
 Verify the output result to execute after on the virtual machines that will be the workers nodes.
